@@ -76,10 +76,19 @@ def load_data_file() -> list[dict] | None:
 
 
 # Copy to clipboard.
-def copy_to_clipboard(text: str) -> None:
+def copy_to_clipboard(
+    text: str,
+    send_success_notification: int = False,
+) -> None:
     try:
         clipman.init()
         clipman.copy(text)
+        if send_success_notification == True:
+            messagebox.showinfo(
+                application_title,
+                f"The following text was successfully copied to your clipboard:\n\n{text}",
+            )
+
     except clipman.exceptions.ClipmanBaseException as error:
         response = messagebox.askyesno(
             application_title,
@@ -163,6 +172,17 @@ def decrease_font_size():
         window_updated(None)
 
 
+################################### Create the label that instructs them to load a file.
+
+
+instructions_label = ttk.Label(window)
+instructions_label.configure(
+    text="To get started, use the File menu. If you need help, use the Help menu for extra assistance and instructions.",
+    justify="center",
+)
+instructions_label.grid(row=0, column=0)
+
+
 ################################### Create window menu options.
 
 
@@ -185,7 +205,7 @@ app_settings_menu.add_command(label="Decrease Font Size", command=decrease_font_
 
 app_utility_menu.add_command(
     label="Test Clipboard Copy",
-    command=lambda: copy_to_clipboard("This was copied successfully!"),
+    command=lambda: copy_to_clipboard("This was copied successfully!", True),
 )
 
 app_utility_menu.add_command(
@@ -211,17 +231,6 @@ menu.add_cascade(menu=app_menu, label="Application")
 menu.add_command(label="Help", command=open_help_page)
 
 window.configure(menu=menu)
-
-
-################################### Create the label that instructs them to load a file.
-
-
-instructions_label = ttk.Label(window)
-instructions_label.configure(
-    text="To get started, use the File menu. If you need help, use the Help menu for extra assistance and instructions.",
-    justify="center",
-)
-instructions_label.grid(row=0, column=0)
 
 
 ################################### Display welcome message and start the main loop of the application.
