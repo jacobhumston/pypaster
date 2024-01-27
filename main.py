@@ -5,6 +5,8 @@ import clipman
 import tkinter
 import json
 import webbrowser
+import os
+import sys
 from tkinter import ttk
 from tkinter import messagebox
 from tkinter import filedialog
@@ -87,12 +89,23 @@ def copy_to_clipboard(text: str) -> None:
     return None
 
 
+# Get path to a file.
+def resource_path(relative_path):
+    try:
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
+
+
 ################################### Create the window.
 
 
 window = tkinter.Tk()
 window.title(application_title)
 window.resizable(False, False)
+window.iconphoto(False, tkinter.PhotoImage(file=resource_path("icon.png")))
 
 
 ################################### Create window menu options functions.
