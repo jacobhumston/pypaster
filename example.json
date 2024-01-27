@@ -1,0 +1,28 @@
+{
+    "data": [
+        {
+            "header": "SampleHeader1",
+            "strings": [
+                "This is a random sentence 1.",
+                "Here's another random sentence 2.",
+                "Feel free to copy and paste this sentence 3."
+            ]
+        },
+        {
+            "header": "SampleHeader2",
+            "strings": [
+                "Random sentence 4 for testing purposes.",
+                "Copy this sentence 5 and paste it where needed.",
+                "A unique random sentence 6."
+            ]
+        },
+        {
+            "header": "SampleHeader3",
+            "strings": [
+                "Sentence 7 is here for your use.",
+                "Paste this sentence 8 in the appropriate place.",
+                "Yet another random sentence 9."
+            ]
+        }
+    ]
+}
