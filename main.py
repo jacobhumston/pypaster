@@ -1,7 +1,7 @@
 ################################### Imports
 
 
-import pyperclip
+import clipman
 import tkinter
 import json
 import webbrowser
@@ -15,6 +15,7 @@ from tkinter import filedialog
 
 application_title = "PyPaster"
 json_decoder = json.JSONDecoder()
+
 
 ################################### Utility functions.
 
@@ -69,6 +70,23 @@ def load_data_file() -> list[dict] | None:
                 return load_data_file()
 
 
+# Copy to clipboard.
+def copy_to_clipboard(text: str) -> None:
+    try:
+        clipman.init()
+        clipman.copy(text)
+    except clipman.exceptions.ClipmanBaseException as error:
+        response = messagebox.askyesno(
+            application_title,
+            f"Failed to copy to clipboard.\n{error}\n\nWould you like to go our help page?",
+        )
+        if response == True:
+            webbrowser.open(
+                "https://github.com/jacobhumston/pypaster/wiki/Clipboard-functionality-is-not-supported-on-your-device-by-default"
+            )
+    return None
+
+
 ################################### Create the window.
 
 
@@ -88,7 +106,9 @@ def toggle_always_on_top():
 
 # Open the help/info/website.
 def open_help_page():
-    webbrowser.open("https://example.com")
+    webbrowser.open(
+        "https://github.com/jacobhumston/pypaster/wiki/How-to-Setup-PyPaster"
+    )
 
 
 ################################### Create window menu options.
@@ -100,6 +120,10 @@ file_menu = tkinter.Menu(window, tearoff=False)
 app_menu = tkinter.Menu(window, tearoff=False)
 
 file_menu.add_command(label="Open", command=load_data_file)
+app_menu.add_command(
+    label="Test Clipboard Copy",
+    command=lambda: copy_to_clipboard("This was copied successfully!"),
+)
 app_menu.add_command(label="Toggle Always on Top", command=toggle_always_on_top)
 app_menu.add_command(label="Quit", command=window.quit)
 menu.add_command(label="Help", command=open_help_page)
