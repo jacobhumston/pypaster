@@ -7,6 +7,7 @@ import json
 import webbrowser
 import os
 import sys
+import math
 from tkinter import ttk
 from tkinter import messagebox
 from tkinter import filedialog
@@ -17,6 +18,8 @@ from tkinter import filedialog
 
 application_title = "PyPaster"
 json_decoder = json.JSONDecoder()
+current_font_size = 12
+recommended_word_wrap = current_font_size * 30
 
 
 ################################### Utility functions.
@@ -104,8 +107,28 @@ def resource_path(relative_path):
 
 window = tkinter.Tk()
 window.title(application_title)
-window.resizable(False, False)
+window.resizable(True, True)
 window.iconphoto(False, tkinter.PhotoImage(file=resource_path("icon.png")))
+window.eval("tk::PlaceWindow . center")
+window.configure(padx=15, pady=15)
+
+
+# Listen for whenever the window is updated.
+def window_updated(_):
+    global recommended_word_wrap
+    children = window.winfo_children()
+    recommended_word_wrap = current_font_size * math.floor(
+        (window.winfo_width() - 10) / current_font_size
+    )
+    # print(recommended_word_wrap, window.winfo_width())
+    for child in children:
+        if isinstance(child, ttk.Label) or isinstance(child, ttk.Button):
+            child.configure(
+                wraplength=recommended_word_wrap, font=f"Arial {current_font_size}"
+            )
+
+
+window.bind("<Configure>", window_updated)
 
 
 ################################### Create window menu options functions.
@@ -124,6 +147,22 @@ def open_help_page():
     )
 
 
+# Modify font size. (Increase.)
+def increase_font_size():
+    global current_font_size
+    current_font_size = current_font_size + 4
+    window_updated(None)
+
+
+# Modify font size. (Decrease.)
+def decrease_font_size():
+    global current_font_size
+    if current_font_size > 12 - 4:
+        # print(current_font_size, current_font_size > 12 - 4)
+        current_font_size = current_font_size - 4
+        window_updated(None)
+
+
 ################################### Create window menu options.
 
 
@@ -131,21 +170,66 @@ menu = tkinter.Menu(window)
 
 file_menu = tkinter.Menu(window, tearoff=False)
 app_menu = tkinter.Menu(window, tearoff=False)
+app_settings_menu = tkinter.Menu(window, tearoff=False)
+app_utility_menu = tkinter.Menu(window, tearoff=False)
 
 file_menu.add_command(label="Open", command=load_data_file)
-app_menu.add_command(
+
+app_settings_menu.add_command(
+    label="Toggle Always on Top", command=toggle_always_on_top
+)
+
+app_settings_menu.add_command(label="Increase Font Size", command=increase_font_size)
+
+app_settings_menu.add_command(label="Decrease Font Size", command=decrease_font_size)
+
+app_utility_menu.add_command(
     label="Test Clipboard Copy",
     command=lambda: copy_to_clipboard("This was copied successfully!"),
 )
-app_menu.add_command(label="Toggle Always on Top", command=toggle_always_on_top)
+
+app_utility_menu.add_command(
+    label="Center Window",
+    command=lambda: window.eval("tk::PlaceWindow . center"),
+)
+
+app_menu.add_cascade(menu=app_settings_menu, label="Settings")
+app_menu.add_cascade(menu=app_utility_menu, label="Utility")
+
+app_menu.add_command(
+    label="Credits",
+    command=lambda: messagebox.showinfo(
+        application_title,
+        "This application was created by Jacob Humston. (jacobhumston on GitHub)\n\nFree and open source for anyone to use!\nhttps://github.com/jacobhumston/pypaster",
+    ),
+)
+
 app_menu.add_command(label="Quit", command=window.quit)
-menu.add_command(label="Help", command=open_help_page)
 
 menu.add_cascade(menu=file_menu, label="File")
 menu.add_cascade(menu=app_menu, label="Application")
+menu.add_command(label="Help", command=open_help_page)
+
 window.configure(menu=menu)
 
 
-################################### Start the main loop of the application.
+################################### Create the label that instructs them to load a file.
 
+
+instructions_label = ttk.Label(window)
+instructions_label.configure(
+    text="To get started, use the File menu. If you need help, use the Help menu for extra assistance and instructions.",
+    justify="center",
+)
+instructions_label.grid(row=0, column=0)
+
+
+################################### Display welcome message and start the main loop of the application.
+
+
+# messagebox.showinfo(
+#    application_title,
+#    "To get started, click 'File > Open'. If you have never used this application before, please click the 'Help' button for more instructions.",
+# )
+window_updated(None)
 window.mainloop()
